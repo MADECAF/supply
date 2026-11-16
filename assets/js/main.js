@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="cart-item-top">
             <div>
               <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-format">${item.formatLabel} &bull; Unit: RM ${item.price.toFixed(2)}</div>
+              <div class="cart-item-format">${item.formatLabel} &mdash; Unit: RM ${item.price.toFixed(2)}</div>
             </div>
             <button class="cart-item-remove" data-action="remove" data-index="${idx}" aria-label="Remove item">Remove</button>
           </div>
@@ -414,36 +414,36 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 1,
       start: 0,
       end: 10,
-      tag: 'SCENE 1 / 4 &bull; TERROIR & INDIGENOUS CANOPY',
+      tag: 'SCENE 1 / 4 — TERROIR & INDIGENOUS CANOPY',
       title: 'THE WILD GREEN HEART',
-      sub: 'Mananjary Terroir &bull; -21.4326° S, 48.3712° E &bull; Altitude 450m',
+      sub: 'Mananjary, Sambirano & Masomeloka — Altitude 450m',
       glow: 'rgba(54, 63, 50, 0.45)'
     },
     {
       id: 2,
       start: 10,
       end: 20,
-      tag: 'SCENE 2 / 4 &bull; SELECTIVE HARVEST & SCREEN 18',
+      tag: 'SCENE 2 / 4 — SELECTIVE HARVEST & SCREEN 18',
       title: 'PRECISION SORTING',
-      sub: 'Density Calibration &bull; Defect Count &le; 5 &bull; Moisture 11.2%',
+      sub: 'Density Calibration, Defect Count &le; 5, Moisture 11.2%',
       glow: 'rgba(113, 117, 94, 0.45)'
     },
     {
       id: 3,
       start: 20,
       end: 30,
-      tag: 'SCENE 3 / 4 &bull; DIRECT MALAYSIA AIR CORRIDOR',
+      tag: 'SCENE 3 / 4 — DIRECT MALAYSIA AIR CORRIDOR',
       title: 'AIR FREIGHT COURIER',
-      sub: 'Antananarivo (TNR) &rarr; Kuala Lumpur (KUL) &bull; Nitrogen Foil Pouches',
+      sub: 'Antananarivo (TNR) &rarr; Kuala Lumpur (KUL) — Nitrogen Foil Pouches',
       glow: 'rgba(164, 136, 102, 0.45)'
     },
     {
       id: 4,
       start: 30,
       end: 40,
-      tag: 'SCENE 4 / 4 &bull; THE CUPPING TABLE',
+      tag: 'SCENE 4 / 4 — THE CUPPING TABLE',
       title: 'SPECIALTY CUPPING SCORE',
-      sub: 'Zero Harshness &bull; Rich Crema &bull; Cocoa Nibs, Toasted Almond, Cane Sugar',
+      sub: 'Zero Harshness, Rich Crema — Cocoa Nibs, Toasted Almond, Cane Sugar',
       glow: 'rgba(122, 75, 42, 0.45)'
     }
   ];
@@ -684,12 +684,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cinematic Central Typography Overlay
     ctx.save();
     ctx.textAlign = 'center';
-    
+
     // Eyebrow Tag
     ctx.fillStyle = 'rgba(235, 226, 213, 0.75)';
     ctx.font = '700 13px "Space Grotesk", monospace';
     ctx.letterSpacing = '0.15em';
-    ctx.fillText(scene.tag.replace('&bull;', '•'), w / 2, h * 0.28);
+    ctx.fillText(scene.tag, w / 2, h * 0.28);
 
     // Grand Scene Title
     ctx.fillStyle = '#FFFFFF';
@@ -699,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Subtitle Spec
     ctx.fillStyle = '#E5D4BB';
     ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(scene.sub.replace(/&bull;/g, '•').replace('&rarr;', '→').replace('&le;', '≤'), w / 2, h * 0.42);
+    ctx.fillText(scene.sub.replace('&rarr;', '→').replace('&le;', '≤'), w / 2, h * 0.42);
 
     ctx.restore();
   };
@@ -815,94 +815,100 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 6. COFFEE MATCHMAKER (Embedded in Personalised Sourcing)
+  // 6. COFFEE MATCHMAKER (Qualitative Preferences -> Custom Sourcing Brief)
   // =========================================================================
   const matchmakerForm = document.getElementById('matchmakerForm');
   const matchResult = document.getElementById('matchResult');
-  const resultCoffeeName = document.getElementById('resultCoffeeName');
-  const resultProcess = document.getElementById('resultProcess');
-  const resultRationale = document.getElementById('resultRationale');
-  const btnViewMatchedCoffee = document.getElementById('btnViewMatchedCoffee');
+  const briefSummaryGrid = document.getElementById('briefSummaryGrid');
   const btnApplyMatchToSourcing = document.getElementById('btnApplyMatchToSourcing');
   const matchmakerPrefillNotice = document.getElementById('matchmakerPrefillNotice');
   const btnApplyMatchToContact = document.getElementById('btnApplyMatchToContact');
+  const flavourPillsGroup = document.getElementById('flavourPillsGroup');
 
   let lastMatch = null;
+
+  // Interactive Flavour Preference Pills (multi-select)
+  if (flavourPillsGroup) {
+    flavourPillsGroup.querySelectorAll('.flavour-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('active');
+        const isActive = pill.classList.contains('active');
+        pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    });
+  }
 
   if (matchmakerForm) {
     matchmakerForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const roastSelect = document.getElementById('critRoast');
-      const methodSelect = document.getElementById('critMethod');
-      const aromaSelect = document.getElementById('critAroma');
-      const needsInput = document.getElementById('critSourcingNeeds');
+      const processSelect = document.getElementById('critProcess');
+      const appSelect = document.getElementById('critApplication');
+      const bodySelect = document.getElementById('critBody');
+      const aciditySelect = document.getElementById('critAcidity');
 
-      const roastVal = roastSelect ? roastSelect.value : 'omni';
-      const methodVal = methodSelect ? methodSelect.value : 'specialty';
-      const aromaVal = aromaSelect ? aromaSelect.value : 'balanced';
-      const customNeeds = needsInput ? needsInput.value.trim() : '';
+      const roastVal = roastSelect ? roastSelect.value : 'Medium';
+      const processVal = processSelect ? processSelect.value : 'Natural';
+      const appVal = appSelect ? appSelect.value : 'Espresso';
+      const bodyVal = bodySelect ? bodySelect.value : 'Full';
+      const acidityVal = aciditySelect ? aciditySelect.value : 'Low';
 
-      const roastText = roastSelect && roastSelect.selectedOptions[0] ? roastSelect.selectedOptions[0].text : roastVal;
-      const methodText = methodSelect && methodSelect.selectedOptions[0] ? methodSelect.selectedOptions[0].text : methodVal;
-      const aromaText = aromaSelect && aromaSelect.selectedOptions[0] ? aromaSelect.selectedOptions[0].text : aromaVal;
-
-      // Intelligent roastery analysis & recommendation synthesis
-      let recTitle = '';
-      let processTag = '';
-      let synthesisText = '';
-      let benchmarkProd = PRODUCTS_DATA.p1;
-      let benchmarkRationale = '';
-
-      if (aromaVal === 'distinctive' || (methodVal === 'specialty' && roastVal === 'omni')) {
-        recTitle = 'High-Altitude Honey-Processed Robusta Micro-Lot';
-        processTag = 'Specialty Honey Process • Screen 18';
-        synthesisText = `For ${roastText.toLowerCase()} intended for ${methodText.toLowerCase()}, your roasting protocol benefits from beans with elevated residual mucilage. We recommend a controlled yellowing phase and progressive airflow through first crack to preserve native wild honey sweetness and fruit nuance without harsh astringency.`;
-        benchmarkProd = PRODUCTS_DATA.p3; // Signature Robusta Honey
-        benchmarkRationale = `Our catalogue benchmark ${benchmarkProd.name} (${benchmarkProd.process}) shares this sweet, complex cup architecture and is available in sample pouches for initial roast calibration.`;
-      } else if (aromaVal === 'earthy' || roastVal === 'dark' || methodVal === 'milk') {
-        recTitle = 'Dense Natural Robusta High-Body Espresso Foundation';
-        processTag = 'Natural Dry Process • Screen 16/18 Grade 1';
-        synthesisText = `For ${roastText.toLowerCase()} targeting ${methodText.toLowerCase()}, a natural dry-processed Malagasy lot offers high bean density and exceptional solubility. The natural canopy drying produces thick, long-lasting crema and deep cocoa-hazelnut resonance that slices cleanly through milk drinks.`;
-        benchmarkProd = PRODUCTS_DATA.p1; // Highland Robusta Natural
-        benchmarkRationale = `Our catalogue benchmark ${benchmarkProd.name} (${benchmarkProd.process}) serves as the reference lot for this heavy-body espresso foundation.`;
-      } else {
-        recTitle = 'High-Grown Washed Robusta Clean-Cup Selection';
-        processTag = 'Fully Washed • Screen 18 Strictly Clean';
-        synthesisText = `For a versatile ${roastText.toLowerCase()} crafted for ${methodText.toLowerCase()}, a fully washed Malagasy Robusta offers rare cup clarity, subtle brightness, and balanced nutty sweetness. Thorough washing and mechanical density sorting ensure uniform roast conduction across commercial batches.`;
-        benchmarkProd = PRODUCTS_DATA.p2; // Select Robusta Washed
-        benchmarkRationale = `Our catalogue benchmark ${benchmarkProd.name} (${benchmarkProd.process}) embodies this balanced, versatile profile for preliminary cupping calibration.`;
+      const selectedFlavours = [];
+      if (flavourPillsGroup) {
+        flavourPillsGroup.querySelectorAll('.flavour-pill.active').forEach(pill => {
+          const f = pill.getAttribute('data-flavour');
+          if (f) selectedFlavours.push(f);
+        });
       }
+      const flavoursText = selectedFlavours.length > 0 ? selectedFlavours.join(', ') : 'No specific preference';
 
-      if (customNeeds) {
-        synthesisText += ` Specific Roaster Requirement Noted: "${customNeeds}" — this specification will be incorporated directly into your sourcing profile.`;
-      }
+      const formattedBrief =
+        `CUSTOM SOURCING BRIEF\n` +
+        `- Roasting Profile: ${roastVal}\n` +
+        `- Preferred Processing: ${processVal}\n` +
+        `- Flavour Preferences: ${flavoursText}\n` +
+        `- Body: ${bodyVal}\n` +
+        `- Acidity: ${acidityVal}\n` +
+        `- Intended Application: ${appVal}`;
 
       lastMatch = {
-        recommendationTitle: recTitle,
-        processTag: processTag,
-        synthesis: synthesisText,
-        benchmarkId: benchmarkProd.id,
-        benchmarkName: benchmarkProd.name,
-        benchmarkProcess: benchmarkProd.process,
-        roast: roastText,
-        method: methodText,
-        aroma: aromaText,
-        sourcingNeeds: customNeeds
+        roast: roastVal,
+        process: processVal,
+        flavours: flavoursText,
+        body: bodyVal,
+        acidity: acidityVal,
+        application: appVal,
+        formattedBrief
       };
 
-      // Update Result Box in DOM
-      if (resultCoffeeName) resultCoffeeName.textContent = recTitle;
-      if (resultProcess) resultProcess.textContent = processTag;
-      if (resultRationale) resultRationale.textContent = synthesisText;
-
-      const benchmarkBox = document.getElementById('resultBenchmarkNote');
-      if (benchmarkBox) {
-        benchmarkBox.innerHTML = `<strong>Reference Benchmark:</strong> ${benchmarkRationale}`;
-      }
-
-      if (btnViewMatchedCoffee) {
-        btnViewMatchedCoffee.textContent = `Benchmark with ${benchmarkProd.name}`;
+      if (briefSummaryGrid) {
+        briefSummaryGrid.innerHTML = `
+          <div class="brief-item">
+            <span class="brief-label">Roasting Profile</span>
+            <strong class="brief-val">${roastVal}</strong>
+          </div>
+          <div class="brief-item">
+            <span class="brief-label">Preferred Processing</span>
+            <strong class="brief-val">${processVal}</strong>
+          </div>
+          <div class="brief-item">
+            <span class="brief-label">Flavour Preferences</span>
+            <strong class="brief-val">${flavoursText}</strong>
+          </div>
+          <div class="brief-item">
+            <span class="brief-label">Body</span>
+            <strong class="brief-val">${bodyVal}</strong>
+          </div>
+          <div class="brief-item">
+            <span class="brief-label">Acidity</span>
+            <strong class="brief-val">${acidityVal}</strong>
+          </div>
+          <div class="brief-item">
+            <span class="brief-label">Intended Application</span>
+            <strong class="brief-val">${appVal}</strong>
+          </div>
+        `;
       }
 
       if (matchResult) {
@@ -914,103 +920,46 @@ document.addEventListener('DOMContentLoaded', () => {
         matchmakerPrefillNotice.style.display = 'block';
       }
 
-      showToast(`Recommendation generated: ${recTitle}`);
+      showToast('Custom Sourcing Brief generated.');
     });
   }
 
-  // View Coffee: Smoothly scroll to the benchmark product card and pulse highlight it
-  if (btnViewMatchedCoffee) {
-    btnViewMatchedCoffee.addEventListener('click', () => {
-      if (!lastMatch || !lastMatch.benchmarkId) return;
-      const targetCard = document.getElementById(`product-${lastMatch.benchmarkId}`);
-      if (targetCard) {
-        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        targetCard.classList.add('card-highlight-pulse');
-        setTimeout(() => {
-          targetCard.classList.remove('card-highlight-pulse');
-        }, 2600);
+  function applyBriefToContactForm(scrollToSection = true) {
+    if (!lastMatch) return;
+    const messageInput = document.getElementById('contactMessage');
+    const contactSection = document.getElementById('contact');
+    const nameInput = document.getElementById('contactName');
+
+    if (messageInput) {
+      if (!messageInput.value.includes('CUSTOM SOURCING BRIEF')) {
+        messageInput.value = messageInput.value
+          ? `${messageInput.value}\n\n${lastMatch.formattedBrief}`
+          : `${lastMatch.formattedBrief}\n\nHello MADECAF team, please review our qualitative preferences above so we can discuss sourcing possibilities together.`;
+      } else {
+        messageInput.value = `${lastMatch.formattedBrief}\n\nHello MADECAF team, please review our qualitative preferences above so we can discuss sourcing possibilities together.`;
       }
-    });
+    }
+
+    if (scrollToSection && contactSection) {
+      const headerEl = document.getElementById('mainHeader');
+      const headerOffset = headerEl ? headerEl.offsetHeight : 65;
+      const topPos = Math.ceil(contactSection.getBoundingClientRect().top + window.scrollY - headerOffset);
+      window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+      if (nameInput) setTimeout(() => nameInput.focus(), 450);
+    }
+
+    showToast('Custom Sourcing Brief added to the Contact form.');
   }
 
-  // Apply to Sourcing Request button inside Match Result Box
   if (btnApplyMatchToSourcing) {
     btnApplyMatchToSourcing.addEventListener('click', () => {
-      openPersonalisedSourcingWithMatch();
+      applyBriefToContactForm(true);
     });
   }
 
-  function openPersonalisedSourcingWithMatch() {
-    const modal = document.getElementById('modalPersonalisedSourcing');
-    const form = document.getElementById('personalisedSourcingForm');
-    const successBox = document.getElementById('personalisedSourcingSuccess');
-    const prefsInput = document.getElementById('sourcingPreferences');
-    const qtyInput = document.getElementById('sourcingQuantity');
-    const msgTextarea = document.getElementById('sourcingMessage');
-
-    if (lastMatch) {
-      if (prefsInput) {
-        prefsInput.value = `${lastMatch.recommendationTitle} (${lastMatch.processTag})`;
-      }
-
-      if (qtyInput && lastMatch.sourcingNeeds) {
-        const qtyMatch = lastMatch.sourcingNeeds.match(/(\d+\s*(?:kg|bags?|tons?|fcl|mt|pallet))/i);
-        if (qtyMatch) {
-          qtyInput.value = qtyMatch[1];
-        }
-      }
-
-      if (msgTextarea) {
-        let brief = `Target Profile: ${lastMatch.recommendationTitle}\n`;
-        brief += `Preferences: Roast: ${lastMatch.roast} | Method: ${lastMatch.method} | Flavour: ${lastMatch.aroma}\n`;
-        if (lastMatch.sourcingNeeds) {
-          brief += `Specific Sourcing Needs: ${lastMatch.sourcingNeeds}\n`;
-        }
-        brief += `Consultative Roaster Synthesis:\n${lastMatch.synthesis}\n`;
-        brief += `Catalogue Reference: ${lastMatch.benchmarkName} (${lastMatch.benchmarkProcess})`;
-
-        msgTextarea.value = brief;
-      }
-    }
-
-    if (form) form.style.display = 'block';
-    if (successBox) successBox.style.display = 'none';
-    if (modal) {
-      modal.classList.add('active');
-      const firstInput = document.getElementById('sourcingName');
-      if (firstInput) setTimeout(() => firstInput.focus(), 150);
-    }
-  }
-
-  // Pre-fill Matchmaker info in the Contact B2B form
   if (btnApplyMatchToContact) {
     btnApplyMatchToContact.addEventListener('click', () => {
-      if (!lastMatch) return;
-      const coffeeSelect = document.getElementById('contactCoffeeSelection');
-      const messageInput = document.getElementById('contactMessage');
-      const lookingForSelect = document.getElementById('contactLookingFor');
-
-      if (coffeeSelect && lastMatch.benchmarkName) {
-        for (let i = 0; i < coffeeSelect.options.length; i++) {
-          if (coffeeSelect.options[i].value.includes(lastMatch.benchmarkName)) {
-            coffeeSelect.selectedIndex = i;
-            break;
-          }
-        }
-      }
-
-      if (lookingForSelect && lookingForSelect.value === '') {
-        lookingForSelect.value = 'Personalised Coffee Sourcing';
-      }
-
-      if (messageInput) {
-        const matchNote = `Preferences from Coffee Matchmaker: Target Profile "${lastMatch.recommendationTitle}". Roast: ${lastMatch.roast}; Serving Method: ${lastMatch.method}; Flavour: ${lastMatch.aroma}.${lastMatch.sourcingNeeds ? ` Specific Needs: ${lastMatch.sourcingNeeds}.` : ''}`;
-        if (!messageInput.value.includes('Coffee Matchmaker')) {
-          messageInput.value = messageInput.value ? `${messageInput.value}\n\n${matchNote}` : matchNote;
-        }
-      }
-
-      showToast('Matchmaker preferences added to contact form.');
+      applyBriefToContactForm(false);
     });
   }
 
@@ -1034,10 +983,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const discount = appliedPromo && PROMO_CODES[appliedPromo] ? subtotal * PROMO_CODES[appliedPromo].discount : 0;
       const total = subtotal - discount;
 
-      const itemsSummary = cart.map(i => `&bull; ${i.quantity}x ${i.name} (${i.formatLabel}) — RM ${(i.price * i.quantity).toFixed(2)}`).join('<br>');
+      const itemsSummary = cart.map(i => `- ${i.quantity}x ${i.name} (${i.formatLabel}) — RM ${(i.price * i.quantity).toFixed(2)}`).join('<br>');
 
       checkoutRecapBox.innerHTML = `
-        <div style="font-weight:700; color:var(--c-botanical); margin-bottom:0.4rem;">Selected Sample Pouches (${cart.reduce((a,b)=>a+b.quantity,0)} items):</div>
+        <div style="font-weight:700; color:var(--c-botanical); margin-bottom:0.4rem;">Selected Sample Pouches (${cart.reduce((a, b) => a + b.quantity, 0)} items):</div>
         <div style="font-size:0.85rem; color:var(--c-muted-text); margin-bottom:0.75rem;">${itemsSummary}</div>
         <div style="border-top:1px solid rgba(54,63,50,0.1); padding-top:0.4rem; font-weight:700;">
           Estimated Total: RM ${total.toFixed(2)} ${appliedPromo ? `(Discount code ${appliedPromo} applied)` : ''}
@@ -1094,126 +1043,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 8. WHOLESALE QUOTE, PERSONALISED SOURCING & EQUIPMENT CONTROLLERS
+  // 8. WHOLESALE INQUIRY ROUTING & EQUIPMENT CONTROLLERS
   // =========================================================================
-  const wholesaleModal = document.getElementById('wholesaleModal');
-  const wholesaleQuoteForm = document.getElementById('wholesaleQuoteForm');
-  const quoteCoffeeSelect = document.getElementById('quoteCoffeeSelect');
-
   const openWholesaleModal = (coffeeName) => {
-    if (wholesaleModal) {
-      if (quoteCoffeeSelect && coffeeName) {
-        for (let i = 0; i < quoteCoffeeSelect.options.length; i++) {
-          if (quoteCoffeeSelect.options[i].value.toLowerCase().includes(coffeeName.toLowerCase()) ||
-              coffeeName.toLowerCase().includes(quoteCoffeeSelect.options[i].value.toLowerCase())) {
-            quoteCoffeeSelect.selectedIndex = i;
-            break;
-          }
-        }
-      }
-      const qtyInput = document.getElementById('quoteQuantity');
-      if (qtyInput) qtyInput.value = 60;
-      const form = document.getElementById('wholesaleQuoteForm');
-      const successBox = document.getElementById('wholesaleQuoteSuccess');
-      if (form) form.style.display = 'block';
-      if (successBox) successBox.style.display = 'none';
-      wholesaleModal.classList.add('active');
+    const contactSection = document.getElementById('contact');
+    const messageInput = document.getElementById('contactMessage');
+    const nameInput = document.getElementById('contactName');
+    const selectedCoffee = coffeeName || 'Malagasy Green Robusta';
+
+    if (messageInput) {
+      messageInput.value = `WHOLESALE INQUIRY — ${selectedCoffee} (MOQ 60 kg)\n\nHello MADECAF team, we would like to discuss wholesale availability and shipping terms for ${selectedCoffee}.`;
     }
+
+    if (contactSection) {
+      const headerEl = document.getElementById('mainHeader');
+      const headerOffset = headerEl ? headerEl.offsetHeight : 65;
+      const topPos = Math.ceil(contactSection.getBoundingClientRect().top + window.scrollY - headerOffset);
+      window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+      if (nameInput) setTimeout(() => nameInput.focus(), 450);
+    }
+
+    showToast(`Wholesale inquiry for ${selectedCoffee} loaded into the Contact form.`);
   };
-
-  if (wholesaleQuoteForm) {
-    wholesaleQuoteForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const coffee = quoteCoffeeSelect ? quoteCoffeeSelect.value : 'Highland Robusta';
-      const qtyInput = document.getElementById('quoteQuantity');
-      const qty = parseInt(qtyInput ? qtyInput.value : 60, 10) || 60;
-
-      if (qty < 60) {
-        showToast('Minimum wholesale order quantity is 60 kg.');
-        return;
-      }
-
-      const company = document.getElementById('quoteCompanyName').value.trim();
-      const email = document.getElementById('quoteEmail').value.trim();
-      const message = document.getElementById('quoteMessage').value.trim();
-
-      const successBox = document.getElementById('wholesaleQuoteSuccess');
-      const successText = document.getElementById('quoteSuccessText');
-      const waLink = document.getElementById('quoteWhatsAppLink');
-
-      if (successText) {
-        successText.innerHTML = `Thank you <strong>${company}</strong>! Your wholesale quote request for <strong>${qty} kg</strong> of <strong>${coffee}</strong> has been transmitted. Our origin coordinators will review FOB/CIF delivery terms and email a customized quotation to <strong>${email}</strong> within 24 hours.`;
-      }
-
-      const waMsg = encodeURIComponent(
-        `*MADECAF WHOLESALE QUOTE REQUEST*\n\n` +
-        `*Coffee:* ${coffee}\n` +
-        `*Desired Quantity:* ${qty} kg (Min. 60 kg)\n` +
-        `*Company:* ${company}\n` +
-        `*Email:* ${email}\n` +
-        (message ? `*Notes:* ${message}\n\n` : `\n`) +
-        `_Please provide tailored wholesale allocation and shipping quote._`
-      );
-
-      if (waLink) {
-        waLink.href = `https://wa.me/601160808293?text=${waMsg}`;
-      }
-
-      wholesaleQuoteForm.style.display = 'none';
-      if (successBox) successBox.style.display = 'block';
-      showToast(`Wholesale quote request for ${coffee} submitted.`);
-    });
-  }
-
-  // Section 2: Personalised Coffee Sourcing Modal Controller
-  const btnOpenPersonalisedSourcing = document.getElementById('btnOpenPersonalisedSourcing');
-  const modalPersonalisedSourcing = document.getElementById('modalPersonalisedSourcing');
-  const personalisedSourcingForm = document.getElementById('personalisedSourcingForm');
-
-  if (btnOpenPersonalisedSourcing && modalPersonalisedSourcing) {
-    btnOpenPersonalisedSourcing.addEventListener('click', () => {
-      openPersonalisedSourcingWithMatch();
-    });
-  }
-
-  if (personalisedSourcingForm) {
-    personalisedSourcingForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('sourcingName').value.trim();
-      const company = document.getElementById('sourcingCompany').value.trim();
-      const email = document.getElementById('sourcingEmail').value.trim();
-      const prefs = document.getElementById('sourcingPreferences').value.trim();
-      const qty = document.getElementById('sourcingQuantity').value.trim();
-      const notes = document.getElementById('sourcingMessage').value.trim();
-
-      const successBox = document.getElementById('personalisedSourcingSuccess');
-      const successText = document.getElementById('sourcingSuccessText');
-      const waLink = document.getElementById('sourcingWhatsAppLink');
-
-      if (successText) {
-        successText.innerHTML = `Thank you <strong>${name}</strong> (${company})! Your sourcing requirements for <em>"${prefs}"</em> (${qty}) have been registered. Our team will review matching Malagasy lots and contact you at <strong>${email}</strong>.`;
-      }
-
-      const waMsg = encodeURIComponent(
-        `*PERSONALISED COFFEE SOURCING INQUIRY*\n\n` +
-        `*Contact:* ${name}\n` +
-        `*Company:* ${company}\n` +
-        `*Email:* ${email}\n` +
-        `*Preferences:* ${prefs}\n` +
-        `*Desired Quantity:* ${qty}\n` +
-        (notes ? `*Additional Message:* ${notes}\n\n` : `\n`) +
-        `_Please advise on matching Malagasy lots._`
-      );
-
-      if (waLink) {
-        waLink.href = `https://wa.me/601160808293?text=${waMsg}`;
-      }
-
-      personalisedSourcingForm.style.display = 'none';
-      if (successBox) successBox.style.display = 'block';
-      showToast('Personalised sourcing request submitted.');
-    });
-  }
 
   // Section 3: Coffee Equipment & Accessories Partner Controllers
   const modalEquipmentAffiliate = document.getElementById('modalEquipmentAffiliate');
@@ -1236,7 +1087,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-close-modal]').forEach(btn => {
     btn.addEventListener('click', () => {
-      btn.closest('.modal-overlay').classList.remove('active');
+      const overlay = btn.closest('.modal-overlay');
+      if (overlay) overlay.classList.remove('active');
     });
   });
 
@@ -1249,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // 10. SOURCING CONTACT FORM CONTROLLER
+  // 10. SOURCING CONTACT FORM CONTROLLER (Simplified 4-field B2B Form)
   // =========================================================================
   const sourcingContactForm = document.getElementById('sourcingContactForm');
   const contactFeedback = document.getElementById('contactFeedback');
@@ -1261,25 +1113,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = document.getElementById('contactName').value.trim();
       const roastery = document.getElementById('contactRoastery').value.trim();
       const email = document.getElementById('contactEmail').value.trim();
-      const phone = document.getElementById('contactPhone').value.trim();
-      const lookingFor = document.getElementById('contactLookingFor').value;
-      const quantity = document.getElementById('contactQuantity').value.trim();
-      const coffee = document.getElementById('contactCoffeeSelection').value;
       const message = document.getElementById('contactMessage').value.trim();
 
       contactFeedback.className = 'form-alert success';
       contactFeedback.innerHTML = `
         <div style="font-weight: 700; margin-bottom: 0.35rem;">Thank you, ${name} (${roastery})!</div>
-        <p style="margin: 0; line-height: 1.5;">Your inquiry regarding <strong>${lookingFor}</strong>${quantity ? ` (${quantity})` : ''} for <strong>${coffee}</strong> has been received by our sourcing desk. Our team will review your requirements and reach out to <strong>${email}</strong> directly.</p>
+        <p style="margin: 0; line-height: 1.5;">Your inquiry has been received by our sourcing desk. Our team will review your message and reach out to <strong>${email}</strong> directly.</p>
         <div style="margin-top: 0.75rem;">
-          <a href="https://wa.me/601160808293?text=${encodeURIComponent(`Hello MADECAF, I submitted an inquiry for ${lookingFor} (${coffee}) on behalf of ${roastery}.`)}" target="_blank" rel="noopener noreferrer" class="btn btn-wa-full" style="display: inline-flex; padding: 0.5rem 1rem; font-size: 0.85rem;">
+          <a href="https://wa.me/601160808293?text=${encodeURIComponent(`Hello MADECAF, I submitted an inquiry on behalf of ${roastery} (${name}, ${email}):\n\n${message}`)}" target="_blank" rel="noopener noreferrer" class="btn btn-wa-full" style="display: inline-flex; padding: 0.5rem 1rem; font-size: 0.85rem;">
             Continue via WhatsApp Desk (+60 11 6080 8293)
           </a>
         </div>
       `;
       contactFeedback.style.display = 'block';
 
-      showToast('Sourcing enquiry submitted.');
+      showToast('Inquiry submitted to MADECAF.');
       sourcingContactForm.reset();
     });
   }
@@ -1313,15 +1161,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Smooth anchor scrolling
+  // Smooth anchor scrolling with exact sticky header offset
+  const scrollToAnchorTarget = (targetEl) => {
+    if (!targetEl) return;
+    const headerHeight = mainHeader ? mainHeader.offsetHeight : 65;
+    const isSection = targetEl.tagName === 'SECTION';
+    const extraOffset = isSection ? 0 : 18;
+    const targetTop = Math.ceil(targetEl.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset);
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth'
+    });
+  };
+
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    anchor.addEventListener('click', function (e) {
       const targetId = this.getAttribute('href');
       if (targetId === '#' || !targetId.startsWith('#')) return;
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        targetEl.scrollIntoView({ behavior: 'smooth' });
+        scrollToAnchorTarget(targetEl);
       }
     });
   });
